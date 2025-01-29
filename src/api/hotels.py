@@ -1,6 +1,9 @@
-from fastapi import FastAPI, Query, Body, HTTPException, APIRouter
 
-from shemas.hotels import Hotel, HotelPatch
+
+from fastapi import Query, Body, HTTPException, APIRouter
+
+from src.api.dependencies import PaginationDep
+from src.shemas.hotels import Hotel, HotelPatch
 router = APIRouter(prefix='/hotels', tags=['Отели'])
 
 hotels = [
@@ -15,10 +18,10 @@ hotels = [
 
 @router.get('')
 def get_hotels(
+        pagination: PaginationDep,
         id: int | None = Query(None,description='Айдишник'),
         title: str | None = Query(None,description='Название отеля'),
-        page: int,
-        per_page: int
+
 ):
     hotels_ = []
     for hotel in hotels:
@@ -27,8 +30,10 @@ def get_hotels(
         if title and hotel['title'] != title:
             continue
         hotels_.append(hotel)
-    return hotels_
 
+    if pagination.page and pagination.per_page:
+        return hotels_[pagination.per_page * (pagination.page-1):][:pagination.per_page]
+    return hotels_
 
 
 
