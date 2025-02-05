@@ -1,7 +1,5 @@
-from os import access
 
-from fastapi import APIRouter, HTTPException, Response, Request
-
+from fastapi import APIRouter, HTTPException, Response, Depends
 
 from src.database import async_session_maker
 from src.repositories.users import UsersRepository
@@ -9,7 +7,7 @@ from src.services.auth import AuthService
 
 from src.shemas.users import UserRequestAdd, UserAdd
 
-
+from src.api.dependencies import UserIdDep, get_currant_user_id
 
 router = APIRouter(prefix="/auth",tags=["Авторизация и аутентификация"])
 
@@ -46,8 +44,11 @@ async def login_user(
 
 
 
-@router.get("/only_auth")
-async def only_auth(
-        request: Request
+@router.get("/me")
+async def get_me(
+        user_id: int = Depends(get_currant_user_id),
 ):
-    access_token = ""or None
+    async with async_session_maker() as session:
+        user = await UsersRepository(session).get_one_or_none(id=user_id)
+        return user
+
