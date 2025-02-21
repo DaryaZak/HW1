@@ -1,3 +1,5 @@
+
+
 from src.repositories.bookings import BookingsRepository
 from src.repositories.facilities import FacilitiesRepository, RoomsFacilitiesRepository
 from src.repositories.hotels import HotelsRepository
@@ -26,6 +28,8 @@ class DBManager:
     async def __aexit__(self, *args):
         await self.session.rollback()
         await self.session.close()
+
+
 
 
     async def commit(self):
