@@ -1,21 +1,17 @@
-import json
-from fastapi import Query, Body, APIRouter
+from fastapi import Body, APIRouter
 from fastapi_cache.decorator import cache
 
-from src.iniit import redis_manager
 from src.shemas.facilities import FacilityAdd
 from src.api.dependencies import DBDep
 from src.tasks.tasks import test_task
 
-router = APIRouter(prefix='/facilities', tags=['Удобства'])
-
+router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
 
 @router.get("")
 @cache(expire=10)
 async def get_facilities(db: DBDep):
-    return await  db.facilities.get_all()
-
+    return await db.facilities.get_all()
 
 
 @router.post("")
@@ -25,5 +21,4 @@ async def create_facility(db: DBDep, facility_data: FacilityAdd = Body()):
 
     test_task.delay()
 
-    return {'status': 'OK', 'data': facility}
-
+    return {"status": "OK", "data": facility}

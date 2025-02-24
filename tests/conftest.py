@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 import asyncio
 import json
 from unittest import mock
@@ -11,7 +12,7 @@ from src.api.dependencies import get_db
 from src.config import settings
 from src.database import Base, engine_null_pool, async_session_maker_null_pool
 from src.main import app
-from src.models import *
+from src.models import *  # noqa
 from src.shemas.hotels import HotelAdd
 from src.shemas.rooms import RoomAdd
 from src.utils.db_manager import DBManager
@@ -21,21 +22,23 @@ from src.utils.db_manager import DBManager
 async def check_test_mode():
     assert settings.MODE == "TEST"
 
+
 @pytest.fixture(scope="session")
 def event_loop():
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
 
+
 async def get_db_null_pool():
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
         yield db
+
 
 @pytest.fixture(scope="session")
 async def db() -> DBManager:
     async for db in get_db_null_pool():
         yield db
-
 
 
 app.dependency_overrides[get_db] = get_db_null_pool
@@ -62,22 +65,21 @@ async def setup_database(check_test_mode, db):
         await db_.commit()
 
 
-
 @pytest.fixture(scope="session")
-async def ac()-> AsyncClient:
+async def ac() -> AsyncClient:
     async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
+        transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         yield ac
 
 
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(ac, setup_database):
-    await ac.post(
-    "/auth/register",
-        json={
-            "email": "kot@pes.com",
-            "password": "1234"
-            }
-    )
+    await ac.post("/auth/register", json={"email": "kot@pes.com", "password": "1234"})
 
+
+@pytest.fixture(scope="session")
+async def authenticated_ac(register_user, ac):
+    await ac.post("/auth/login", json={"email": "kot@pes.com", "password": "1234"})
+    assert ac.cookies["access_token"]
+    yield ac

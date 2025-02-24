@@ -3,8 +3,6 @@ from datetime import date
 from src.shemas.bookings import BookingAdd
 
 
-
-
 async def test_booking_crud(db):
     user_id = (await db.users.get_all())[0].id
     room_id = (await db.rooms.get_all())[0].id
@@ -22,9 +20,6 @@ async def test_booking_crud(db):
     assert booking.id == new_booking.id
     assert booking.room_id == new_booking.room_id
     assert booking.user_id == new_booking.user_id
-
-
-
 
     updated_date = date(year=2025, month=2, day=15)
     update_booking_data = BookingAdd(

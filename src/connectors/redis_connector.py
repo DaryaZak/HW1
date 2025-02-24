@@ -1,4 +1,5 @@
-import redis.asyncio  as redis
+import redis.asyncio as redis
+
 
 class RedisManager:
     def __init__(self, host: str, port: int):

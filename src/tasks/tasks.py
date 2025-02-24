@@ -4,9 +4,8 @@ from time import sleep
 from PIL import Image
 import os
 
-from fastapi.exception_handlers import http_exception_handler
 
-from src.database import  async_session_maker_null_pool
+from src.database import async_session_maker_null_pool
 from src.tasks.celery_app import celery_instance
 from src.utils.db_manager import DBManager
 
@@ -16,7 +15,8 @@ def test_task():
     sleep(5)
     print("Я молодец")
 
-#@celery_instance.task
+
+# @celery_instance.task
 def resize_image(image_path: str):
     sizes = [1000, 500, 200]
     output_folder = "src/static/images"
@@ -26,9 +26,10 @@ def resize_image(image_path: str):
     base_name = os.path.basename(image_path)
     name, ext = os.path.splitext(base_name)
 
-
     for size in sizes:
-        img_resized = img.resize((size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS)
+        img_resized = img.resize(
+            (size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS
+        )
 
         new_file_name = f"{name}_{size}px{ext}"
 
@@ -43,7 +44,7 @@ async def get_bookings_with_today_checkin_helper():
         bookings = await db.bookings.get_bookings_with_today_checkin()
         print(f"{bookings=}")
 
+
 @celery_instance.task(name="booking_today_checkin")
 def send_emails_to_users_with_today_checkin():
     asyncio.run(get_bookings_with_today_checkin_helper())
-
