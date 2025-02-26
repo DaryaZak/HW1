@@ -3,6 +3,8 @@ import asyncio
 import json
 from unittest import mock
 
+from typing import AsyncGenerator
+
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 import pytest
