@@ -25,7 +25,7 @@ async def get_rooms(
 @router.get("/{hotel_id}/rooms/{room_id}")
 async def get_room(hotel_id: int, room_id: int, db: DBDep):
     try:
-        return await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
+        return await RoomService(db).get_room(room_id, hotel_id=hotel_id)
     except RoomNotFoundException:
         raise RoomNotFoundHTTPException
 
